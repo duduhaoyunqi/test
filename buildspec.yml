@@ -1,26 +1,18 @@
 version: 0.2
-phases: 
-  pre_build: 
-    commands: 
-    - echo Logging in to Amazon ECR.... 
-    - aws --version
-    # update the following line with your own region
-    - $(aws ecr get-login --no-include-email --region cn-north-1) 
-    - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
-    - IMAGE_TAG=${COMMIT_HASH:=latest}
-    - REPOSITORY_URI=189092930338.dkr.ecr.cn-north-1.amazonaws.com.cn/test1
-  build: 
-    commands: 
-    - echo Build started on `date` 
-    - echo Building the Docker image... 
-    # update the following line with the name of your own ECR repository
-    - docker build -t $REPOSITORY_URI:latest .
-    # update the following line with the URI of your own ECR repository (view the Push Commands in the console)
-    - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG 
-  post_build: 
-    commands: 
-    - echo Build completed on `date` 
-    - echo pushing to repo
-    # update the following line with the URI of your own ECR repository
-    - docker push $REPOSITORY_URI:latest
-    - docker push $REPOSITORY_URI:$IMAGE_TAG
+
+phases:
+  pre_build:
+    commands:
+      - echo Logging in to Amazon ECR...
+      - $(aws ecr get-login --no-include-email --region $AWS_DEFAULT_REGION)
+  build:
+    commands:
+      - echo Build started on `date`
+      - echo Building the Docker image...          
+      - docker build -t test1:latest .  
+      - docker tag test1:latest 189092930338.dkr.ecr.cn-north-1.amazonaws.com.cn/test1    
+  post_build:
+    commands:
+      - echo Build completed on `date`
+      - echo Pushing the Docker image...
+      - docker push 189092930338.dkr.ecr.cn-north-1.amazonaws.com.cn/test1:latest
