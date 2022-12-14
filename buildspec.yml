@@ -1,19 +1,12 @@
 version: 0.2
-
 phases:
   pre_build:
     commands:
-      - echo Logging in to Amazon ECR...
-      - aws --version
-      - $(aws ecr get-login --region $AWS_DEFAULT_REGION --no-include-email)
-      - REPOSITORY_URI=189092930338.dkr.ecr.cn-north-1.amazonaws.com.cn/test1
-      - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
-      - IMAGE_TAG=build-$(echo $CODEBUILD_BUILD_ID | awk -F":" '{print $2}')
+      - aws ecr get-login-password --region cn-north-1 | docker login --username AWS --password-stdin 189092930338.dkr.ecr.cn-north-1.amazonaws.com.cn
   build:
     commands:
-      - docker build -t $REPOSITORY_URI:latest .
-      - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
+      - docker build -t test1 .
+      - docker tag test1:latest 189092930338.dkr.ecr.cn-north-1.amazonaws.com.cn/test1:latest
   post_build:
     commands:
-      - docker push $REPOSITORY_URI:latest
-      - docker push $REPOSITORY_URI:$IMAGE_TAG
+      - docker push 189092930338.dkr.ecr.cn-north-1.amazonaws.com.cn/test1:latest
